@@ -9,8 +9,9 @@ You have to have a few things installed on your system for successful completion
 + [Node.js](https://nodejs.org/en/download/prebuilt-installer)
 + Any IDE (I use [VS Code](https://code.visualstudio.com/download))
 
-## Steps to execute the test
+## Steps to run the project
 
 1. Clone the repository to your local machine.
-2. Run `npm install` on the terminal of the project folder. You can see a new `node_modules` folder popping up in the folder.
-3. Run `npx wdio run ./wdio.conf.js`
+2. Open the folder in your IDE.
+3. Open the terminal here and run the command `npm install`. You can see a new `node_modules` folder popping up in your project folder.
+4. Run `npx wdio run ./wdio.conf.js`
