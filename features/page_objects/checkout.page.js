@@ -13,6 +13,7 @@ var regex = /[+-]?\d+(\.\d+)?/;
 
 class Checkout {
 
+    //Function to fill user details during checkout
     async fill() {
         await $(checkoutTitle).isDisplayed();
         await browser.pause(1000);
@@ -22,12 +23,14 @@ class Checkout {
         await browser.pause(1000);
     }
 
+    //Fucntion to click Continue button
     async clickContinue() {
         await $(contBtn).isClickable();
         await $(contBtn).click();
         await browser.pause(1000);
     }
 
+    //Function to click Finish button
     async clickFinish() {
         if($(finBtn).isDisplayed({withinViewport: true}) == false) {
             await $(finBtn).scrollIntoView();
@@ -38,6 +41,7 @@ class Checkout {
         await browser.pause(1000);
     }
 
+    //Function to verify the total price (including tax) of all items in the cart
     async verifyTotal() {
         let subtotal = 0;
         for await (const item of $$(itemPrice)) {

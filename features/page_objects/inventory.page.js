@@ -8,14 +8,8 @@ const dropdown = "//select[@class='product_sort_container']";
 const itemName = "//div[@data-test='inventory-item-name']"; 
 const itemPrice = "//div[@class='inventory_item_price']";
 
-var flag, beforeFilterNames, afterFilterNames, beforeFilterPrice, afterFilterPrice;
-var before = [];
-var after = [];
+var flag, beforeFilterNames, afterFilterNames, beforeFilterPrice, afterFilterPrice, before, after;
 var regex = /[+-]?\d+(\.\d+)?/;
-
-// function randomNumber(min, max) {
-//     return Math.random() * (max - min) + min;
-// }
 
 class Inventory {
 
@@ -26,6 +20,7 @@ class Inventory {
         //await browser.pause(1000);
     }
 
+    //Function to add an item to the cart
     async addToCart() {
         await $(add1).isClickable();
         await $(add1).click();
@@ -34,6 +29,7 @@ class Inventory {
         await browser.pause(1000);
     }
 
+    //Function to add multiple items to the cart
     async addMultiple() {
         for(let i=1; i<=3; i++) {
             let elem = '/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[' + i + ']/div[2]/div[2]/button[1]';
@@ -48,6 +44,7 @@ class Inventory {
         }
     }
 
+    //Function to select Name (A to Z) from the select box
     async alpha() {
         beforeFilterNames = [], before = [];
         beforeFilterNames = await $$(itemName).getElements();
@@ -60,6 +57,7 @@ class Inventory {
         await browser.pause(1000);
     }
 
+    //Function to select Name (Z to A) from the select box
     async reverseAlpha() {
         beforeFilterNames = [], before = [];
         beforeFilterNames = await $$(itemName).getElements();
@@ -73,6 +71,7 @@ class Inventory {
         await browser.pause(1000);
     }
 
+    //Function to select Price (low to high) from the select box
     async lowToHigh() {
         beforeFilterPrice = [], before = [];
         beforeFilterPrice = await $$(itemPrice).getElements();
@@ -89,6 +88,7 @@ class Inventory {
         await browser.pause(1000);
     }
 
+    //Function to select Price (high to low) from the select box
     async highToLow() {
         beforeFilterPrice = [], before = [];
         beforeFilterPrice = await $$(itemPrice).getElements();
@@ -105,6 +105,7 @@ class Inventory {
         await browser.pause(1000);
     }
 
+    //Function to verify sorting functionality according to selected option
     async verifySort(val) {
         if(val == 'za' || val == 'az') {
             afterFilterNames = [], after = [];

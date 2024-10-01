@@ -14,6 +14,7 @@ const cartItem ="(//div[@class='cart_item'])"
 
 class Cart {
 
+    //Function to navigate to the cart page
     async open () {
         await $(cartBtn).isClickable();
         await $(cartBtn).click();
@@ -21,12 +22,14 @@ class Cart {
         await browser.pause(1000);
     }
 
+    //Function to verify that the item added to the cart is displayed
     async itemDisplayed() {
         await $(yourCart).isDisplayed();
         await $(desc1).isDisplayed();
         await browser.pause(1000);
     }
 
+    //Function to verify that the items added to the cart are displayed
     async itemsDisplayed() {
         await $(yourCart).isDisplayed();
         await $(desc1).isDisplayed();
@@ -35,6 +38,7 @@ class Cart {
         await browser.pause(1000);
     }
 
+    //Function to click on checkout button
     async clickBtn() {
         if($(checkoutBtn).isDisplayed({withinViewport: true}) == false) {
             await $(checkoutBtn).scrollIntoView();
@@ -45,6 +49,7 @@ class Cart {
         await browser.pause(1000);
     }
 
+    //Function to remove an item from the cart
     async removeItem() {
         await expect($(yourCart)).toBeDisplayed();
         await expect($(cartItem)).toBeDisplayed();
@@ -54,6 +59,7 @@ class Cart {
         await browser.pause(1000);
     }
 
+    //Function to verify that the removed item no longer exists in the cart
     async verifyRemove() {
         await expect($(remove)).not.toBeDisplayed();
         await browser.pause(1000);

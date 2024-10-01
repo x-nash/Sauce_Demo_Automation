@@ -6,24 +6,28 @@ const logoutButton = "//a[@id='logout_sidebar_link']";
 
 class Confirmation {
 
+    //Function to verify confirmation page
     async displayMessage() {
         await browser.url(confirmUrl);
         await browser.pause(1000);
         await expect($(message)).toHaveText("Thank you for your order!");
     }
 
+    //Function to open the menu 
     async openMenu() {
         await $(menu).isClickable();
         await $(menu).click();
         await browser.pause(1000);
     }
 
+    //Function to click on logout option from the menu
     async selectLogout() {
         await $(logoutButton).isClickable();
         await $(logoutButton).click();
         await browser.pause(1000);
     }
 
+    //Function to verify logout
     async verifyLogout() {
         await browser.url(loginUrl);
         await browser.pause(1000);
