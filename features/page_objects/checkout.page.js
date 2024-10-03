@@ -1,3 +1,6 @@
+import {browser, $} from '@wdio/globals';
+import { expect } from 'chai';
+
 const checkoutTitle = "//span[@class='title']";
 const firstname = "//input[@id='first-name']";
 const lastname = "//input[@id='last-name']";
@@ -15,7 +18,8 @@ class Checkout {
 
     //Function to fill user details during checkout
     async fill() {
-        await $(checkoutTitle).isDisplayed();
+        const displayed = await $(checkoutTitle).isDisplayed();
+        expect(displayed).to.be.true;
         await browser.pause(1000);
         await $(firstname).setValue('test');
         await $(lastname).setValue('user');
@@ -50,12 +54,15 @@ class Checkout {
             subtotal = subtotal+floats1[0];
           }
         await $(totalLabel).scrollIntoView();
-        await $(subLabel).isDisplayed();
-        await expect($(subLabel)).toHaveText(expect.stringContaining(String(subtotal)));
+        const displayed = await $(subLabel).isDisplayed();
+        expect(displayed).to.be.true;
+        const expectedSubtotal = await $(subLabel).getText();
+        expect(expectedSubtotal).to.contain(String(subtotal));
         const tax = await $(taxLabel).getText();
         var floats2 = tax.match(regex).map(function(v) { return parseFloat(v); });
         const total = subtotal+floats2[0];
-        await expect($(totalLabel)).toHaveText(expect.stringContaining(String(total)));
+        const expectedTotal = await $(totalLabel).getText();
+        expect(expectedTotal).to.contain(String(total));
         await browser.pause(3000);
     }
 }

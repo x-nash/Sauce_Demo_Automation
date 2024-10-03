@@ -1,3 +1,6 @@
+import { expect } from "chai";
+import { browser, $ } from '@wdio/globals';
+
 const confirmUrl = "https://www.saucedemo.com/checkout-complete.html";
 const loginUrl = "https://www.saucedemo.com/"
 const message = "//h2[@class='complete-header']";
@@ -10,7 +13,8 @@ class Confirmation {
     async displayMessage() {
         await browser.url(confirmUrl);
         await browser.pause(1000);
-        await expect($(message)).toHaveText("Thank you for your order!");
+        const expectedString = await $(message).getText();
+        expect(expectedString).to.equal("Thank you for your order!");
     }
 
     //Function to open the menu 

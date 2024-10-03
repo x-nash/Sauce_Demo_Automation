@@ -1,4 +1,5 @@
-import { $ } from '@wdio/globals';
+import { browser, $ } from '@wdio/globals';
+import { expect } from 'chai';
 
 const cartUrl = 'https://www.saucedemo.com/cart.html'
 
@@ -24,17 +25,23 @@ class Cart {
 
     //Function to verify that the item added to the cart is displayed
     async itemDisplayed() {
-        await $(yourCart).isDisplayed();
-        await $(desc1).isDisplayed();
+        const displayed1 = await $(yourCart).isDisplayed();
+        expect(displayed1).to.be.true;
+        const displayed2 = await $(desc1).isDisplayed();
+        expect(displayed2).to.be.true;
         await browser.pause(1000);
     }
 
     //Function to verify that the items added to the cart are displayed
     async itemsDisplayed() {
-        await $(yourCart).isDisplayed();
-        await $(desc1).isDisplayed();
-        await $(desc2).isDisplayed();
-        await $(desc3).isDisplayed();
+        const displayed1 = await $(yourCart).isDisplayed();
+        expect(displayed1).to.be.true;
+        const displayed2 = await $(desc1).isDisplayed()
+        expect(displayed2).to.be.true;
+        const displayed3 =await $(desc2).isDisplayed()
+        expect(displayed3).to.be.true;
+        const displayed4 = await $(desc3).isDisplayed()
+        expect(displayed4).to.be.true;
         await browser.pause(1000);
     }
 
@@ -51,8 +58,10 @@ class Cart {
 
     //Function to remove an item from the cart
     async removeItem() {
-        await expect($(yourCart)).toBeDisplayed();
-        await expect($(cartItem)).toBeDisplayed();
+        const displayed1 = await $(yourCart).isDisplayed()
+        expect(displayed1).to.be.true;
+        const displayed2 = await $(cartItem).isDisplayed()
+        expect(displayed2).to.be.true;
         await browser.pause(1000);
         await $(remove).isClickable();
         await $(remove).click();
@@ -61,7 +70,8 @@ class Cart {
 
     //Function to verify that the removed item no longer exists in the cart
     async verifyRemove() {
-        await expect($(remove)).not.toBeDisplayed();
+        const displayed = await $(remove).isDisplayed()
+        expect(displayed).to.be.false;
         await browser.pause(1000);
     }
 }

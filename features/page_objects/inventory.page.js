@@ -1,4 +1,5 @@
 import {browser, $} from '@wdio/globals';
+import { expect } from 'chai';
 
 const url = "https://www.saucedemo.com/inventory.html";
 const add1 = '/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/button[1]';
@@ -16,8 +17,8 @@ class Inventory {
     //Function to verify landing page
     async isOpen() {
         await browser.url(url);
-        await expect($(title)).toBeDisplayed();
-        //await browser.pause(1000);
+        const displayed = await $(title).isDisplayed();
+        expect(displayed).to.be.true;
     }
 
     //Function to add an item to the cart
@@ -25,7 +26,8 @@ class Inventory {
         await $(add1).isClickable();
         await $(add1).click();
         await $(badge).waitForExist();
-        await expect($(add1)).toHaveText('Remove');
+        const expectedString = await $(add1).getText();
+        expect(expectedString).to.equal('Remove');
         await browser.pause(1000);
     }
 
@@ -39,7 +41,8 @@ class Inventory {
             }
             await $(elem).isClickable();
             await $(elem).click();
-            await expect($(elem)).toHaveText('Remove');
+            const expectedString = await $(elem).getText();
+            expect(expectedString).to.equal('Remove');
             await browser.pause(1000);
         }
     }
@@ -83,7 +86,8 @@ class Inventory {
         before.sort((a,b) => {
             return a-b;
         });
-        await $(dropdown).waitForDisplayed();
+        const displayed = await $(dropdown).isDisplayed();
+        expect(displayed).to.be.true;
         await $(dropdown).selectByAttribute('value', 'lohi');
         await browser.pause(1000);
     }
@@ -100,7 +104,8 @@ class Inventory {
         before.sort((a,b) => {
             return b-a;
         });
-        await $(dropdown).waitForDisplayed();
+        const displayed = await $(dropdown).isDisplayed();
+        expect(displayed).to.be.true;
         await $(dropdown).selectByAttribute('value', 'hilo');
         await browser.pause(1000);
     }
@@ -114,10 +119,7 @@ class Inventory {
                 var y = await x.getText();
                 after.push(y);
             }
-            if (JSON.stringify(before) == JSON.stringify(after)) {
-                flag = true;
-            }
-            expect(flag).toBe(true);
+            expect(before).to.deep.equal(after);
             await browser.pause(1000);
         }
 
@@ -130,13 +132,7 @@ class Inventory {
                 var item = y.match(regex).map(function(v) { return parseFloat(v); });
                 after.push(item[0]);
             }
-            for(var i=0, j=0; i<before.length; i++, j++) {
-                if(before[i] !== after[j]) {
-                    flag = false;
-                    break;
-                }
-            }
-            expect(flag).toBe(true);
+            expect(before).to.deep.equal(after);
             await browser.pause(1000);
         }
     }
