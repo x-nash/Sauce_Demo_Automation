@@ -1,5 +1,7 @@
+@all
 Feature: Saucedemo website
 
+  @first
   Scenario: User logs in, adds an item to cart, completes checkout and logs out
 
     Given I am on the Sauce Demo login page
@@ -22,6 +24,7 @@ Feature: Saucedemo website
     |username | password |
     |standard_user | secret_sauce |
 
+  @second
   Scenario: User adds multiple items to the cart, removes an item, completes checkout and logs out
 
     Given I am on the Sauce Demo login page
@@ -47,6 +50,7 @@ Feature: Saucedemo website
     |username | password |
     |standard_user | secret_sauce |
 
+  @third
   Scenario: User adds multiple items to the cart, verifies the total price, checks out and logs out
 
     Given I am on the Sauce Demo login page
@@ -70,6 +74,7 @@ Feature: Saucedemo website
     |username | password |
     |standard_user | secret_sauce |
 
+  @fourth
   Scenario: User checks if items get sorted in the right order and logs out
 
     Given I am on the Sauce Demo login page
