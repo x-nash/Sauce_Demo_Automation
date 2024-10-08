@@ -1,3 +1,14 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Path to the allure-results folder
+const allureResultsDir = path.join(__dirname, 'allure-results');
+
 export const config = {
     //
     // ====================
@@ -187,6 +198,23 @@ export const config = {
      */
     // onPrepare: function (config, capabilities) {
     // },
+    onPrepare: function (config, capabilities) {
+      // Check if the allure-results folder exists
+      if (fs.existsSync(allureResultsDir)) {
+          // Read all files in the directory
+          fs.readdir(allureResultsDir, (err, files) => {
+              if (err) throw err;
+
+              // Loop through each file and delete it
+              for (const file of files) {
+                  fs.unlink(path.join(allureResultsDir, file), err => {
+                      if (err) throw err;
+                  });
+              }
+              console.log('Cleared previous Allure results');
+          });
+      }
+  },
     /**
      * Gets executed before a worker process is spawned and can be used to initialize specific service
      * for that worker as well as modify runtime environments in an async fashion.
