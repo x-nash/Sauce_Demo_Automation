@@ -137,8 +137,9 @@ export const config = {
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: [ 'spec', ['allure', {
       outputDir: 'allure-results',
-      disableWebdriverStepsReporting: true,
+      disableWebdriverStepsReporting: false,
       disableWebdriverScreenshotsReporting: false,
+      useCucumberStepReporter: true
       }], 
     ],
 
@@ -273,9 +274,9 @@ export const config = {
     // },
     afterStep: async function (step, scenario, { error, duration, passed }, context) {
       if (error) {
-        //await browser.takeScreenshot();
-        var date = Date.now();
-        browser.saveScreenshot("./allure-results/screenshots/Chrome-" + date + ".png")
+        await browser.takeScreenshot();
+        // var date = Date.now();
+        // await browser.saveScreenshot("./allure-results/screenshots/Chrome-" + date + ".png")
       }
     },
     /**
@@ -335,6 +336,7 @@ export const config = {
      */
     // onComplete: function(exitCode, config, capabilities, results) {
     // },
+    /*
     onComplete: function() {
       const reportError = new Error('Could not generate Allure report')
       const generation = allure(['generate', 'allure-results', '--clean'])
@@ -355,6 +357,8 @@ export const config = {
           })
       })
   },
+  */
+
     /**
     * Gets executed when a refresh happens.
     * @param {string} oldSessionId session ID of the old session
