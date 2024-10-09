@@ -1,13 +1,20 @@
 import allure from 'allure-commandline';
-import fs from 'fs';
+import fs, { open } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, URL } from 'url';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import archiver from 'archiver';
+import HtmlReporter, { ReportAggregator, ReportGenerator } from 'wdio-html-nice-reporter';
+import puppeteer from 'puppeteer';
+import report, { generate } from "multiple-cucumber-html-reporter";
+
 
 // Get __dirname equivalent for ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+let reportAggregator = new ReportAggregator();
 
 export const config = {
     //
@@ -146,12 +153,34 @@ export const config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: [ 'spec', ['allure', {
-      outputDir: 'allure-results',
-      disableWebdriverStepsReporting: false,
-      disableWebdriverScreenshotsReporting: false,
-      useCucumberStepReporter: true
-      }], 
+    reporters: [ 'spec', 
+      /*
+      ['multiple-cucumber-html', {
+        htmlReporter: {
+          jsonFolder: './reports/html-reports/json-output',
+          reportFolder: `./reports/html-reports/`,
+      }
+      }],
+      */
+     
+      [HtmlReporter, {
+          outputDir: './reports/html-reports/',  // Directory where the HTML report will be saved
+          filename: 'report.html',        // Name of the generated report file
+          reportTitle: 'Test Execution Report',     // Title for the HTML report
+          // Optional configurations
+          showInBrowser: true,                   // Automatically opens the report in the browser
+          collapseTests: true,                   // Collapse tests in the report for easier navigation
+          useOnAfterCommandForScreenshot: false, // Use screenshots (set to false if not needed)
+          linkScreenshots: true,                 // If screenshots are taken, link them in the report
+      }],
+      /*
+      ['allure', {
+        outputDir: './allure-results',
+        disableWebdriverStepsReporting: false,
+        disableWebdriverScreenshotsReporting: false,
+        useCucumberStepReporter: true
+        }], 
+        */
     ],
 
     // If you are using Cucumber you need to specify the location of your step definitions.
@@ -223,6 +252,7 @@ export const config = {
       // Path to your results and reports directories
       const allureResultsDir = path.join(__dirname, 'allure-results');
       const allureReportDir = path.join(__dirname, 'allure-report');
+      const reportsDir = path.join(__dirname, 'reports')
       
       // Function to clean up directories
       const cleanDirectory = (dirPath) => {
@@ -242,6 +272,18 @@ export const config = {
       // Clear the Allure results and report directories
       cleanDirectory(allureResultsDir);
       cleanDirectory(allureReportDir);
+      cleanDirectory(reportsDir);
+      
+      reportAggregator = new ReportGenerator({
+        outputDir: '.reports/html-reports/',
+        filename: 'master-report.html',
+        reportTitle: 'Master Report',
+        browserName: 'chrome',
+        collapseTests: true
+      });
+      //reportAggregator.clean();
+      
+  
   },
     /**
      * Gets executed before a worker process is spawned and can be used to initialize specific service
@@ -376,6 +418,8 @@ export const config = {
     // },
     
     after: async function (result, capabilities, specs) {
+
+      /*
       const reportError = new Error('Could not generate Allure report')
       const generation = allure(['generate', 'allure-results', '--clean'])
       return new Promise((resolve, reject) => {
@@ -396,6 +440,7 @@ export const config = {
               resolve()
           })
       })
+  */
   },
 
 
@@ -417,7 +462,143 @@ export const config = {
      */
     // onComplete: function(exitCode, config, capabilities, results) {
     // },
+    onComplete: async function(exitCode, config, capabilities, results) {
+
+      console.log('Results object:', results);
+      try {
+        await reportAggregator.createReport();
+        console.log('Master report generated successfully');
+      } catch (error) {
+          console.error('Error while generating the master report:', error);
+      }
+      
+      /*
+      function zipDirectory(sourceDir, outPath) {
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        const stream = fs.createWriteStream(outPath);
     
+        return new Promise((resolve, reject) => {
+            archive
+                .directory(sourceDir, false)
+                .on('error', err => reject(err))
+                .pipe(stream);
+    
+            stream.on('close', () => resolve());
+            archive.finalize();
+        });
+    }
+    zipDirectory('allure-report', 'allure-report.zip')
+        .then(() => console.log('Allure report zipped successfully'))
+        .catch(err => console.error('Error while zipping the report:', err));
+      */
+        /*
+        async function generatePDF() {
+          console.log("INSIDE FUNCTION")
+          try {
+            console.log("INSIDE TRY BLOCK")
+            const browser = await puppeteer.launch({headless: false});
+            const page = await browser.newPage();
+            console.log("AFTER LAUNCH")
+            const reportPath = new URL(`file://${process.cwd()}/allure-report/index.html`);
+            const response = await page.goto(reportPath.href, { waitUntil: 'networkidle0' });
+            if (!response || !response.ok()) {
+              console.error('Failed to load the report page:', response?.status());
+              await puppeteerBrowser.close();
+              return;
+            }
+            try {
+              await page.pdf({ path: 'C:/Users/DELL/Downloads/Swag-Labs-automation/report.pdf', format: 'A4' });
+              console.log('PDF generated successfully!');
+              } catch (error) {
+                  console.error('Error generating PDF:', error);
+              }
+            await puppeteerBrowser.close();
+          } 
+          catch (error) {
+              console.error('Error launching Puppeteer:', error);
+          }
+          
+      }
+
+      generatePDF().catch(console.error);
+    */
+
+    /*
+      () => {
+        report.generate({
+          jsonDir: "./reports/html-reports/json-output/",
+          reportPath: "./reports/html-reports/",
+        });
+      };
+      */
+
+
+      /*
+      const OAuth2 = google.auth.OAuth2;
+      
+      const oauth2Client = new OAuth2(
+        '48578771741-2mr5g8ghr4egrsgbhpjhrmm3uv6oooqd.apps.googleusercontent.com',       
+        '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',    
+        'https://developers.google.com/oauthplayground' // Redirect URL
+      );
+
+      // Set your refresh token here
+      oauth2Client.setCredentials({
+        refresh_token: '1//04JuL5ORkAf95CgYIARAAGAQSNwF-L9IrKmOPUe6sf7OtIAgpRUjgeibvy6hkv1LpS3iJS67k0JSEey2hSKosWjB3k7Xql_uXUgQ', // Refresh token obtained from OAuth 2.0 Playground
+      });
+
+      async function sendEmail() {
+        try {
+          const accessToken = await oauth2Client.getAccessToken();
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              type: 'OAuth2',
+              user: 'nashita.shameena@gmail.com', // Your Gmail address
+              clientId: '48578771741-2mr5g8ghr4egrsgbhpjhrmm3uv6oooqd.apps.googleusercontent.com',
+              clientSecret: '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',
+              refreshToken: '1//04JuL5ORkAf95CgYIARAAGAQSNwF-L9IrKmOPUe6sf7OtIAgpRUjgeibvy6hkv1LpS3iJS67k0JSEey2hSKosWjB3k7Xql_uXUgQ',
+              accessToken: accessToken.token, // Access token generated from OAuth2
+            },
+          });
+
+          const reportFilePath = path.resolve('./repots/html-reports/', 'master-report-0-0.html');
+        
+          // Read the test report from the file system
+          const reportContent = fs.readFileSync(reportFilePath, 'utf8');
+
+          const mailOptions = {
+            from: 'nashita.shameena@gmail.com',
+            to: 'nashita.shameena@gmail.com', 
+            subject: 'Test Email',
+            attachments: [
+              {
+                  filename: 'master-report-0-0.html',
+                  path: reportFilePath, 
+                  contentType: 'text/html'
+              }
+            ],
+            text: 'Hello from Node.js with OAuth2! This email contains the test report for the first scenario.',
+            html: reportContent,
+          };
+
+          const result = await transporter.sendMail(mailOptions);
+          console.log('Email sent: ', result);
+        } catch (error) {
+          console.error('Error sending email: ', error);
+        }
+      }
+
+      try {
+        await sendEmail();
+      } 
+      catch (error) {
+          console.error('Error sending email:', error);
+      }
+    */
+  },
+  
 
     /**
     * Gets executed when a refresh happens.
