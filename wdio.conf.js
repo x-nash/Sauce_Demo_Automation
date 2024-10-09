@@ -1,13 +1,13 @@
+import allure from 'allure-commandline';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
 
 // Get __dirname equivalent for ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Path to the allure-results folder
-const allureResultsDir = path.join(__dirname, 'allure-results');
 
 export const config = {
     //
@@ -198,22 +198,50 @@ export const config = {
      */
     // onPrepare: function (config, capabilities) {
     // },
-    onPrepare: function (config, capabilities) {
-      // Check if the allure-results folder exists
-      if (fs.existsSync(allureResultsDir)) {
-          // Read all files in the directory
-          fs.readdir(allureResultsDir, (err, files) => {
-              if (err) throw err;
+  //   onPrepare: function (config, capabilities) {
+  //     const allureResultsDir = path.join(__dirname, 'allure-results');
+  //     // Check if the allure-results folder exists
+  //     if (fs.existsSync(allureResultsDir)) {
+  //         // Read all files in the directory
+  //         fs.readdir(allureResultsDir, (err, files) => {
+  //             if (err) throw err;
 
-              // Loop through each file and delete it
-              for (const file of files) {
-                  fs.unlink(path.join(allureResultsDir, file), err => {
-                      if (err) throw err;
-                  });
-              }
-              console.log('Cleared previous Allure results');
-          });
-      }
+  //             // Loop through each file and delete it
+  //             for (const file of files) {
+  //                 fs.unlink(path.join(allureResultsDir, file), err => {
+  //                     if (err) throw err;
+  //                 });
+  //             }
+  //             console.log('Cleared previous Allure results');
+  //         });
+  //     }
+  // },
+
+    onPrepare: function (config, capabilities) {
+      console.log('Clearing old test results and reports...');
+      
+      // Path to your results and reports directories
+      const allureResultsDir = path.join(__dirname, 'allure-results');
+      const allureReportDir = path.join(__dirname, 'allure-report');
+      
+      // Function to clean up directories
+      const cleanDirectory = (dirPath) => {
+          if (fs.existsSync(dirPath)) {
+              fs.readdirSync(dirPath).forEach((file) => {
+                  const currentPath = path.join(dirPath, file);
+                  if (fs.lstatSync(currentPath).isDirectory()) {
+                      cleanDirectory(currentPath); // Recursively delete subdirectories
+                  } else {
+                      fs.unlinkSync(currentPath); // Delete files
+                  }
+              });
+              console.log(`Cleared directory: ${dirPath}`);
+          }
+      };
+
+      // Clear the Allure results and report directories
+      cleanDirectory(allureResultsDir);
+      cleanDirectory(allureReportDir);
   },
     /**
      * Gets executed before a worker process is spawned and can be used to initialize specific service
@@ -346,6 +374,31 @@ export const config = {
      */
     // after: function (result, capabilities, specs) {
     // },
+    
+    after: async function (result, capabilities, specs) {
+      const reportError = new Error('Could not generate Allure report')
+      const generation = allure(['generate', 'allure-results', '--clean'])
+      return new Promise((resolve, reject) => {
+          const generationTimeout = setTimeout(
+              () => reject(reportError),
+              10000)
+
+          generation.on('exit', function(exitCode) {
+              clearTimeout(generationTimeout)
+
+              console.log(`Allure CLI process exited with code: ${exitCode}`);
+
+              if (exitCode !== 0) {
+                  return reject(reportError)
+              }
+
+              console.log('Allure report successfully generated')
+              resolve()
+          })
+      })
+  },
+
+
     /**
      * Gets executed right after terminating the webdriver session.
      * @param {object} config wdio configuration object
@@ -364,28 +417,7 @@ export const config = {
      */
     // onComplete: function(exitCode, config, capabilities, results) {
     // },
-    /*
-    onComplete: function() {
-      const reportError = new Error('Could not generate Allure report')
-      const generation = allure(['generate', 'allure-results', '--clean'])
-      return new Promise((resolve, reject) => {
-          const generationTimeout = setTimeout(
-              () => reject(reportError),
-              5000)
-
-          generation.on('exit', function(exitCode) {
-              clearTimeout(generationTimeout)
-
-              if (exitCode !== 0) {
-                  return reject(reportError)
-              }
-
-              console.log('Allure report successfully generated')
-              resolve()
-          })
-      })
-  },
-  */
+    
 
     /**
     * Gets executed when a refresh happens.
