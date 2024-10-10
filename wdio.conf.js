@@ -14,6 +14,9 @@ import report, { generate } from "multiple-cucumber-html-reporter";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let retryCount = 0;
+const maxRetries = 1;
+
 let reportAggregator = new ReportAggregator();
 
 export const config = {
@@ -389,6 +392,22 @@ export const config = {
      */
     // afterScenario: function (world, result, context) {
     // },
+    afterScenario: async function(scenario) {
+      if (scenario.result.status === 'FAILED') {
+        retryCount++;
+        if (retryCount <= maxRetries) {
+            console.log(`Retrying scenario: ${scenario.pickle.name} (Attempt ${retryCount})`);
+            await browser.reloadSession(); // Optionally reload the session
+            await browser.call(() => this.runScenario(scenario.pickle.name));
+        } else {
+            console.log(`Scenario failed after ${maxRetries} attempts: ${scenario.pickle.name}`);
+            retryCount = 0; // Reset the count after exceeding the max retries
+          }
+      } else {
+          retryCount = 0; // Reset on success
+      }
+    },
+
     /**
      *
      * Runs after a Cucumber Feature.

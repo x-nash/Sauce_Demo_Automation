@@ -5,7 +5,7 @@ const url = "https://www.saucedemo.com/inventory.html";
 const add1 = '/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/button[1]';
 const badge = '//span[@class="shopping_cart_badge"]';
 const title = "//span[@class='title']";
-const dropdown = "//select[@class='product_sort_container']abc";
+const dropdown = "//select[@class='product_sort_container']";
 const itemName = "//div[@data-test='inventory-item-name']"; 
 const itemPrice = "//div[@class='inventory_item_price']";
 
@@ -56,7 +56,7 @@ class Inventory {
             before.push(y);
         }
         before.sort();
-        await $(dropdown).selectByAttribute('value', 'az');
+        await $(dropdo).selectByAttribute('value', 'az');
         await browser.pause(1000);
     }
 
