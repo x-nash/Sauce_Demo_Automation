@@ -13,7 +13,7 @@ When(/^I add multiple items to the cart$/, async () => {
 	await Inventory.addMultiple();
 })
 
-When(/^I click on Name - Z to A from the dropdown$/, async () => {
+When(/^I click on Name - Z to A from the dropdown$/, { wrapperOptions: { retry: 2 } }, async () => {
 	await Inventory.reverseAlpha();
 });
 

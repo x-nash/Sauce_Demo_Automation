@@ -373,8 +373,8 @@ export const config = {
     afterStep: async function (step, scenario, { error, duration, passed }, context) {
       if (error) {
         await browser.takeScreenshot();
-        // var date = Date.now();
-        // await browser.saveScreenshot("./allure-results/screenshots/Chrome-" + date + ".png")
+        var date = Date.now();
+        await browser.saveScreenshot("./reports/html-reports/screenshots/Chrome-" + date + ".png")
       }
     },
     /**
