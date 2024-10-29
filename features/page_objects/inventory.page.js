@@ -56,7 +56,7 @@ class Inventory {
             before.push(y);
         }
         before.sort();
-        await $(dropdo).selectByAttribute('value', 'az');
+        await $(dropdown).selectByAttribute('value', 'az');
         await browser.pause(1000);
     }
 
