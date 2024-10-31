@@ -18,13 +18,12 @@ You have to have a few things installed on your system for successful completion
 4. Create folders named "allure-results" and "html-report" in the project folder. (This step is required only if you want the test reports to be genrated and saved into these folders)
 5. Run `npm run wdio`. You can see the automated tests being executed.
 
-<blockquote>    
- [!TIP]
+## Extra steps 
  
  If you want the tests to be sent via gmail to any email account, add the following code inside the `config` object in the `wdio.conf.js` file before running the tests:
 
  ```
-   onComplete: async function(exitCode, config, capabilities, results) {
+ onComplete: async function(exitCode, config, capabilities, results) {
     const OAuth2 = google.auth.OAuth2;
      
     const oauth2Client = new OAuth2(
@@ -42,19 +41,19 @@ You have to have a few things installed on your system for successful completion
       try {
         const accessToken = await oauth2Client.getAccessToken();
 
-       const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            type: 'OAuth2',
-            user: 'your_email@gmail.com', // Replace with your Gmail address
-            clientId: 'YOUR_CLIENT_ID', // Replace with your client ID
-            clientSecret: 'YOUR_CLIENT_SECRET', // Replace with your client secret 
-            refreshToken: 'YOUR_REFRESH_TOKEN', // Replace with your refresh token
-            accessToken: accessToken.token, 
-          },
-        });
-
-       const allureReportPath = path.resolve('./allure-report', 'index.html');
+        const transporter = nodemailer.createTransport({
+           service: 'gmail',
+           auth: {
+             type: 'OAuth2',
+             user: 'your_email@gmail.com', // Replace with your Gmail address
+             clientId: 'YOUR_CLIENT_ID', // Replace with your client ID
+             clientSecret: 'YOUR_CLIENT_SECRET', // Replace with your client secret 
+             refreshToken: 'YOUR_REFRESH_TOKEN', // Replace with your refresh token
+             accessToken: accessToken.token, 
+           },
+         });
+ 
+        const allureReportPath = path.resolve('./allure-report', 'index.html');
         const htmlReportPath = path.resolve('./html-report', 'html-report.html');
         const htmlReportContent = fs.readFileSync(htmlReportPath, { encoding: 'utf8' });;
     
@@ -71,21 +70,22 @@ You have to have a few things installed on your system for successful completion
             }
           ], 
         };
-
+ 
         const result = await transporter.sendMail(mailOptions);
         console.log('Email sent: ', result);
-      } catch (error) {
+     }
+     catch (error) {
         console.error('Error sending email: ', error);
-      }
-    }
+     }
+   }
 
-    try {
-      await sendEmail();
-    } 
-    catch (error) {
-        console.error('Error sending email:', error);
-    }  
-  }
+   try {
+     await sendEmail();
+   } 
+   catch (error) {
+       console.error('Error sending email:', error);
+   }
+ }
   ```
 
   You can obtain your client ID and client secret by following these steps:
@@ -98,5 +98,4 @@ You have to have a few things installed on your system for successful completion
   2. In the settings select the "Use your own OAuth credentials" checkbox and enter your client ID and client secret
   3. Now on the left side of the screen, in Step 1, scroll to "Gmail API v1" and select `https://mail.google.com/` and click on "Authorize APIs" button
   4. Now in Step 2, click on "Exchange authorization code for tokens" and get your refresh token
-</blockquote>
 
