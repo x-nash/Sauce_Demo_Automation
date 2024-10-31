@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath, URL } from 'url';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-import HtmlReporter, { ReportAggregator, ReportGenerator } from 'wdio-html-nice-reporter';
+import CustomHtmlReporter from './CustomHtmlReporter.js';
 
 // Get __dirname equivalent for ES module
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +13,6 @@ const __dirname = path.dirname(__filename);
 let retryCount = 0;
 const maxRetries = 1;
 
-//let reportAggregator = new ReportAggregator();
 
 export const config = {
    
@@ -29,17 +28,14 @@ export const config = {
       {
         maxInstances: 1,
         browserName: 'chrome',
+        acceptInsecureCerts: true,       
         'goog:chromeOptions': {
-          args: [
-            // Additional options you want to set
-          ],
-          excludeSwitches: [
-            'enable-logging',
-            'enable-bidi-mapper'  // This disables the BiDi CDP Mapper
-          ]
+          args: ['--disable-gpu'],
         }
+          
       }
     ],
+  
   logLevel: 'info',
   bail: 0,
   waitforTimeout: 1000000,
@@ -48,33 +44,21 @@ export const config = {
   services: ['visual'],
   framework: 'cucumber',
   reporters: [ 'spec',
-    /*
-    [HtmlReporter, {
-        outputDir: './reports/html-reports/',  // Directory where the HTML report will be saved
-        filename: 'report.html',        // Name of the generated report file
-        reportTitle: 'Test Execution Report',     // Title for the HTML report
-        browserName: 'chrome',
-        // Optional configurations
-        showInBrowser: true,                   // Automatically opens the report in the browser
-        collapseTests: true,                   // Collapse tests in the report for easier navigation
-        useOnAfterCommandForScreenshot: false, // Use screenshots (set to false if not needed)
-        linkScreenshots: true,                 // If screenshots are taken, link them in the report
-    }],
-    */
+
     ['allure', {
       outputDir: './allure-results',
       disableWebdriverStepsReporting: false,
       disableWebdriverScreenshotsReporting: false,
       useCucumberStepReporter: true
       }], 
+      [CustomHtmlReporter, { outputDir: './html-report' 
+      }],
   ],
 
   // If you are using Cucumber you need to specify the location of your step definitions.
   cucumberOpts: {
       // <string[]> (file/dir) require files before executing features
       require: ['./features/step_definitions/*.js'], 
-
-      format: ['json:./reports/html-reports/json-output/cucumber_report.json'], 
       // <boolean> show full backtrace for errors
       backtrace: false,
       // <string[]> ("extension:module") require files with the given EXTENSION after requiring MODULE (repeatable)
@@ -105,7 +89,6 @@ export const config = {
     // Path to your results and reports directories
     const allureResultsDir = path.join(__dirname, 'allure-results');
     const allureReportDir = path.join(__dirname, 'allure-report');
-    const reportsDir = path.join(__dirname, 'reports')
     
     // Function to clean up directories
     const cleanDirectory = (dirPath) => {
@@ -124,7 +107,6 @@ export const config = {
 
     cleanDirectory(allureResultsDir);
     cleanDirectory(allureReportDir);
-    cleanDirectory(reportsDir);
   },
 
   afterStep: async function (step, scenario, { error, duration, passed }, context) {
@@ -173,4 +155,6 @@ export const config = {
         })
     })
   },
+
+  
 };

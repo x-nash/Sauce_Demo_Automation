@@ -11,13 +11,13 @@
     "@wdio/visual-service": "^6.0.0",
     "allure-commandline": "^2.30.0",
     "chai": "^5.1.1",
-    "fs-extra": "^11.2.0",
-    "wdio-html-nice-reporter": "^8.1.6"
+    "fs-extra": "^11.2.0"
   },
   "scripts": {
     "wdio": "wdio run ./wdio.conf.js"
   },
   "dependencies": {
+    "chromedriver": "^130.0.1",
     "googleapis": "^144.0.0",
     "nodemailer": "^6.9.15"
   }
