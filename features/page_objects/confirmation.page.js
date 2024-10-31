@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { browser, $ } from '@wdio/globals';
 
-const confirmUrl = "https://www.saucedemo.com/checkout-complete.html";
+const confirmUrl = "https://www.saucedemo.com/checkout-complete.html/";
 const loginUrl = "https://www.saucedemo.com/"
 const message = "//h2[@class='complete-header']";
 const menu = "//button[@id='react-burger-menu-btn']";

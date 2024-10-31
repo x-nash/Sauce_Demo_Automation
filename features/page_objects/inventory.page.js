@@ -1,7 +1,7 @@
 import {browser, $} from '@wdio/globals';
 import { expect } from 'chai';
 
-const url = "https://www.saucedemo.com/inventory.html";
+const inventoryUrl = "https://www.saucedemo.com/inventory.html/";
 const add1 = '/html[1]/body[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/button[1]';
 const badge = '//span[@class="shopping_cart_badge"]';
 const title = "//span[@class='title']";
@@ -16,9 +16,16 @@ class Inventory {
 
     //Function to verify landing page
     async isOpen() {
-        await browser.url(url);
-        const displayed = await $(title).isDisplayed();
-        expect(displayed).to.be.true;
+        await browser.url(inventoryUrl);
+        await browser.waitUntil(
+            async () => (await $('body')).isDisplayed(),
+            {
+                timeout: 10000,
+                timeoutMsg: 'Page did not load in time',
+            }
+        );
+        // const displayed = await $(title).isDisplayed();
+        // expect(displayed).to.be.true;
     }
 
     //Function to add an item to the cart

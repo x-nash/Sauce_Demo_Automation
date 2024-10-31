@@ -1,7 +1,7 @@
 import { browser, $ } from '@wdio/globals';
 import { expect } from 'chai';
 
-const cartUrl = 'https://www.saucedemo.com/cart.html'
+const cartUrl = 'https://www.saucedemo.com/cart.html/'
 
 const cartBtn = "//a[@class='shopping_cart_link']";
 const yourCart = "//span[@class='title']";
